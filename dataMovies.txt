@@ -1,1 +1,1 @@
-[{"id":1,"name":"Peli 1"},{"name":"peli 2","id":2,"likes":3},{"name":"peli modificada","id":3}]
+[{"id":1,"name":"Peli 1","likes":1},{"name":"peli 2","id":2,"likes":4},{"name":"peli new","id":3,"likes":2},{"name":"peli POST","id":4},{"name":"peli POST","id":5},{"name":"peli POST","id":6},{"name":"peli nueva","id":7}]

@@ -1,64 +1,102 @@
-// module.exports = {
-//   getLikes,
-//   getMovie,
-//   getMovies,
-//   newMovie,
-//   updateMovie,
-//   deleteMovie,
-//   setLikeMovie
-// };
+const files = require('../../utils/files')
 
-// RAUL ---------------
-// const files = require("../../utils/files");
+let movies;
 
-// let movies;
-// files.loadMovies(moviesData => movies = moviesData);
+function load() {
+  return new Promise((resolve, reject) => {
+    files.readMovies()
+      .then((data) => {
+        movies = JSON.parse(data)
+        resolve()
+      })
+      .catch((err) => {
+        reject(err)
+      });
+    })
+}
 
-// function getLikes() {
-//   return movies.filter(movie => movie.like === true);
-// }
+function getMovies() {
+  return movies
+}
 
-// function getMovie(movieId) {
-//   return movies.find(movie => movie.id === movieId);
-// }
+function getLikes() {
+  console.log(movies);
+  
+  let moviesLiked = movies.filter(movie => movie.likes > 0)
+  console.log(moviesLiked)
+  return moviesLiked
+}
 
-// function getMovies() {
-//   return movies;
-// }
+function getMovie(movieId) {
+  return movies.find(movie => movie.id == movieId)
+}
 
-// function newMovie(movie, callback) {
-//   movie.id = `${movies.length + 1}`;
-//   movies.push(movie);
+function postMovie(newMovie) {
+  const lastMovieId = movies[movies.length - 1].id
+  newMovie.id = lastMovieId + 1
+  movies.push(newMovie)
 
-//   files.saveMovies(movies, err => callback(err, movies));
-// }
+  // Devuelvo la PROMESA y que se encargue el index
+  return files.saveMovies(movies)
+}
 
-// function updateMovie(movie, callback) {
-//   const movieId = movie.id;
-//   let moviePosition = movies.findIndex(movie => movie.id === movieId);
-//   if (moviePosition >= 0) {
-//     movies[moviePosition] = req.body;
-//   }
+// Supongo que aqui va promise por devolver un solo tipo (promise)
+function putMovie(movieId, movie) {
+  return new Promise((resolve, reject) => {
+    const putMovieIndex = movies.findIndex(movie => movie.id == movieId);
 
-//   files.saveMovies(movies, err => callback(err, movies));
-// }
+    if (putMovieIndex >= 0) {
+      movies[putMovieIndex] = {
+        ...movies[putMovieIndex],
+        ...movie
+      }
+      files.saveMovies(movies)
+        .then(() => resolve(movies[putMovieIndex]))
+        .catch(() => reject('Error guardando pelis'))
+    } else {
+      reject('Error modificando peli')
+    }
+  })
+}
 
-// function deleteMovie(movieId, callback) {
-//   const moviePosition = movies.findIndex(movie => movie.id === movieId);
-//   if (moviePosition >= 0) {
-//     movies.splice(moviePosition, 1);
-//   }
+function putLike(movieId) {
+  return new Promise((resolve, reject) => {
+    const putMovieIndex = movies.findIndex(movie => movie.id == movieId);
+    if (putMovieIndex >= 0) {
+      movies[putMovieIndex].likes = (movies[putMovieIndex].likes || 0) + 1 // Si movies[] es undefined, sale 0
+  
+      files.saveMovies(movies)
+        .then(() => resolve(movies[putMovieIndex]))
+        .catch(() => reject('Error guardando pelis'))
+    } else {
+      reject('Error dando like')
+    }
+  })
+}
 
-//   files.saveMovies(movies, err => callback(err, movies));
-// }
+function deleteMovie(movieId) {
+  return new Promise((resolve, reject) => {
+    const deleteMovieIndex = movies.findIndex(movie => movie.id == movieId);
+  
+    if (deleteMovieIndex >= 0) {
+      const deletedMovie = movies.splice(deleteMovieIndex, 1)
+      files.saveMovies(movies)
+        .then(() => resolve(deletedMovie))
+        .catch(() => reject('Error guardando pelis'))
+    } else {
+      reject('Error borrando peli. Id no existe')
+    }
+  })
+}
 
-// function setLikeMovie(movieId, likeValue, callback) {
-//   const movie = movies.find(movie => movie.id === movieId);
-//   if (movie) {
-//     movie.like = likeValue;
-//   }
 
-//   files.saveMovies(movies, err => callback(err, movies));
-// }
-
-// FIN RAUL --------------------------
+module.exports = {
+  getLikes,
+  getMovie,
+  getMovies,
+  postMovie,
+  putMovie,
+  deleteMovie,
+  putLike,
+  load
+};
