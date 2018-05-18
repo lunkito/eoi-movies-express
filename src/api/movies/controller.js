@@ -20,10 +20,7 @@ function getMovies() {
 }
 
 function getLikes() {
-  console.log(movies);
-  
   let moviesLiked = movies.filter(movie => movie.likes > 0)
-  console.log(moviesLiked)
   return moviesLiked
 }
 
