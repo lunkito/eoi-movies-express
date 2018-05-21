@@ -13,7 +13,14 @@ function load() {
 
 //#region GET --------------------------------
 router.get('/', (req, res) => {
-  res.json(controller.getMovies());
+  if (req.session.views == null || req.session.views == undefined) {
+    req.session.views = 1
+    console.log('req.session.views == null', req.session);     
+    res.json(controller.getMovies());
+  } else {
+    console.log('req.session.views != null', req.session);  
+    res.send('Paga la coca, primer aviso')
+  }  
 });
 
 router.get('/likes', (req, res) => {
@@ -48,7 +55,7 @@ router.put('/', (req, res) => {
 
   controller.putMovie(movieId, req.body)
     .then((movie) => res.send(movie))
-    .catch((err) => res.status(500).send(err))
+    .catch((err) => next(err))
 });
 
 router.put('/like/:id', (req, res) => {
