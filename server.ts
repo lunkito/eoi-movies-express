@@ -14,11 +14,11 @@ app.use(session({ secret: '1234' }));
 app.use(express.json());
 app.use('/movies', moviesRouter.router);
 
-function loadData() {
-  return Promise.all([
-    moviesRouter.load(),
-  ]);
-}
+// function loadData() {
+//   return Promise.all([
+//     moviesRouter.load(),
+//   ]);
+// }
 
 // Las function de los middleware tienes 2, 3 o 4 parametros. Siempre los mismos.
 // Se usan con app.use
@@ -47,8 +47,10 @@ function errorSlack(err, req, res, next) {
 app.use(methodOverride());
 app.use(errorHandler);
 
-loadData()
-.then(() => {
-  app.listen(3000, () => console.log('Ready on port 3000'));
-})
-.catch(() => console.log('No se pudo lanzar el servidor'));
+// loadData()
+// .then(() => {
+//   app.listen(3000, () => console.log('Ready on port 3000'));
+// })
+// .catch(() => console.log('No se pudo lanzar el servidor'));
+
+app.listen(3000, () => console.log('Ready on port 3000'));

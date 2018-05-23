@@ -1,44 +1,92 @@
 import * as files from '../../utils/files';
 import { IMovie } from '../../tipes/tipes';
+import { MongoClient, Server, ObjectID } from 'mongodb';
 
-let movies: IMovie[];
+const MONGO_URL = 'localhost:21017';
+const movies: IMovie[] = [];
 
-export function load() {
-  return new Promise((resolve, reject) => {
-    files.readMovies()
-      .then(data => {
-        movies = JSON.parse(data);
-        resolve();
-      })
-      .catch((err) => {
-        reject(err);
-      });
-    });
-}
+// export function load() {
+//   return new Promise((resolve, reject) => {
+//     files.readMovies()
+//       .then(data => {
+//         movies = JSON.parse(data);
+//         resolve();
+//       })
+//       .catch((err) => {
+//         reject(err);
+//       });
+//     });
+// }
 
 export function getMovies() {
-  return movies;
+  return new Promise((resolve, reject) => {
+    MongoClient.connect(MONGO_URL, (err, client) => {
+      if (!err) {
+        const db = client.db('eoiMovies');
+        const moviesCollection = db.collection('movies');
+
+        moviesCollection.find({}).limit(20).toArray()
+          .then(movies => resolve(movies))
+          .catch(errorQuery => reject(errorQuery));
+      } else {
+        reject(err);
+      }
+    });
+  });
 }
 
 export function getLikes() {
-  const moviesLiked: IMovie[] = movies.filter((movie) => movie.likes > 0);
-  return moviesLiked;
+  return new Promise((resolve, reject) => {
+    MongoClient.connect(MONGO_URL, (err, client) => {
+      if (!err) {
+        const db = client.db('eoiMovies');
+        const moviesCollection = db.collection('movies');
+
+        moviesCollection.find({ like: true }).limit(20).toArray()
+          .then(movies => resolve(movies))
+          .catch(err => reject(err));
+      } else {
+        reject(err);
+      }
+    });
+  });
 }
 
 export function getMovie(movieId: number) {
-  return movies.find((movie) => movie.id === movieId);
+  return new Promise((resolve, reject) => {
+    MongoClient.connect(MONGO_URL, (err, client) => {
+      if (!err) {
+        const db = client.db('eoiMovies');
+        const moviesCollection = db.collection('movies');
+
+        moviesCollection.findOne({ _id: new ObjectID(movieId)})
+          .then(movie => resolve(movie))
+          .catch(errorFind => reject(errorFind));
+      } else {
+        reject(err);
+      }
+    });
+  });
 }
 
 export function postMovie(newMovie: IMovie) {
-  const lastMovieId = movies[movies.length - 1].id;
-  newMovie.id = lastMovieId + 1;
-  movies.push(newMovie);
+  return new Promise((resolve, reject) => {
+    const movieToInsert = {...newMovie, created: new Date(), updated: new Date() };
+    MongoClient.connect(MONGO_URL, (err, client) => {
+      if (!err) {
+        const db = client.db('eoiMovies');
+        const moviesCollection = db.collection('movies');
 
-  // Devuelvo la PROMESA y que se encargue el index
-  return files.saveMovies(movies);
+        moviesCollection.insertOne(movieToInsert)
+          .then(() => resolve(movieToInsert))
+          .catch(errorInsert => reject(errorInsert));
+      } else {
+        reject(err);
+      }
+    });
+  });
 }
 
-// Supongo que aqui va promise por devolver un solo tipo (promise)
 export function putMovie(movieId: number, movieFromBody) {
   return new Promise((resolve, reject) => {
     const putMovieIndex = movies.findIndex((movie) => movie.id === movieId);

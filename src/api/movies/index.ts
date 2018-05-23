@@ -3,37 +3,30 @@ import * as controller from './controller';
 
 export const router = express.Router();
 
-export function load() {
-  return new Promise((resolve, reject) => {
-    controller.load()
-      .then(resolve);
-  });
-}
+// export function load() {
+//   return new Promise((resolve, reject) => {
+//     controller.load()
+//       .then(resolve);
+//   });
+// }
 
 //#region GET --------------------------------
 router.get('/', (req, res) => {
-  if (req.session.views === null || req.session.views === undefined) {
-    req.session.views = 1;
-    console.log('req.session.views == null', req.session);
-    res.json(controller.getMovies());
-  } else {
-    console.log('req.session.views != null', req.session);
-    res.send('Paga la coca, primer aviso');
-  }
+  controller.getMovies()
+    .then(movies => res.json(movies))
+    .catch(err => res.status(500).send(err));
 });
 
 router.get('/likes', (req, res) => {
-  res.json(controller.getLikes());
+  controller.getLikes()
+    .then(movies => res.json(movies))
+    .catch(err => res.status(500).send(err));
 });
 
 router.get('/:id', (req, res) => {
-  const movie = controller.getMovie(req.params.id);
-
-  if (movie !== undefined) {
-    res.json(movie);
-  } else {
-    res.status(404).send('Id no valido');
-  }
+  controller.getMovie(req.params.id)
+    .then(movie => res.json(movie))
+    .catch(err => res.status(500).send(err));
 });
 //#endregion
 
