@@ -27,7 +27,6 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   const newMovie = req.body;
 
-  // Esperar a que se guarde el fichero antes de responder
   controller.postMovie(newMovie)
     .then(() => res.json(newMovie))
     .catch(() => res.status(500).send('No se guardo la peli'));
