@@ -3,13 +3,6 @@ import * as controller from './controller';
 
 export const router = express.Router();
 
-// export function load() {
-//   return new Promise((resolve, reject) => {
-//     controller.load()
-//       .then(resolve);
-//   });
-// }
-
 //#region GET --------------------------------
 router.get('/', (req, res) => {
   controller.getMovies()
@@ -53,7 +46,7 @@ router.put('/', (req, res, next) => {
 router.put('/like/:id', (req, res, next) => {
   const movieId = req.params.id;
 
-  controller.putLike(movieId)
+  controller.putLike(movieId, true)
     .then(movie => res.send(movie))
     .catch(err => next(err));
 });
