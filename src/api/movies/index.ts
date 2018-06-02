@@ -5,6 +5,7 @@ export const router = express.Router();
 
 //#region GET --------------------------------
 router.get('/', (req, res) => {
+  console.log('Entra a /');
   controller.getMovies()
     .then(movies => res.json(movies))
     .catch(err => res.status(500).send(err));

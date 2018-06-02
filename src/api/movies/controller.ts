@@ -1,7 +1,7 @@
 import * as files from '../../utils/files';
 import { MongoClient, Server, ObjectID } from 'mongodb';
 
-const MONGO_URL = 'localhost:21017';
+const MONGO_URL = 'mongodb://localhost:27017';
 
 export function getMovies() {
   return new Promise((resolve, reject) => {
@@ -11,7 +11,9 @@ export function getMovies() {
         const moviesCollection = db.collection('movies');
 
         moviesCollection.find({}).limit(20).toArray()
-        .then(movies => resolve(movies))
+        .then(movies => {
+          resolve(movies);
+        })
         .catch(errorQuery => reject(errorQuery));
       } else {
         reject(err);
