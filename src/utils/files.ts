@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-const filePath = '../../dataMovies.txt';
+const filePath = './dataMovies.txt';
 
 export function saveMovies(data) {
   return new Promise((resolve, reject) => {
